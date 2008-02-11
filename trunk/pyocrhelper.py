@@ -2,13 +2,12 @@
 import sys,os,re,time,subprocess,config,shutil
 from PIL import Image
 
-class pyOcr2:
+class pyocrhelper:
 
     def __init__(self,inputFile,outputFile="",outputFileFormat=""):
         """ Initialise with an input and optionally output
             file. Read configuration.
         """
-        print "init()"
         self.rawText = []
         self.rawImageHolder = [] # hold images before converting to target
         self.readyImageHolder = [] # hold images ready for ocr
@@ -43,11 +42,19 @@ class pyOcr2:
             else:
                 self.write = None
 
+    def _testSetup(self):
+        """
+        Check the setup:
+            - is ocropus present?
+            - is pdftoppm present?
+            - is PIL present?
+        """
+        pass
+
     def clearTmp(self):
         """ Remove all files from temporary directory
             Typically called before starting and after finishing
         """
-        print "clearTmp"
         contents = os.listdir(self.defaults['tmpdir'])
         if len(contents)==0:
             return True
@@ -70,7 +77,6 @@ class pyOcr2:
         """ Read in the configuration from the config module and
             sort the values into a dictionary.
         """
-        print "getDefaultsFromConfig"
         try:
             readConfig = config.Start()
         except Exception,e:
@@ -92,7 +98,6 @@ class pyOcr2:
             (2). if not (1) then look at outputFile extension
             (3). if not (2) then look at default from config
         """
-        print "getOutputFormat"
         if outputFileFormat != "" and outputFileFormat != None:
             if outputFileFormat.lower() in self.allowed_fmt:
                 return outputFileFormat.lower()
@@ -124,7 +129,6 @@ class pyOcr2:
         """ Determine the incoming file type. If the filetype
             is not allowed raise appropriate error.
         """
-        print "getFileType"
         try:
             im = Image.open(self.inputFileAbspath)
         except Exception,e:
@@ -182,7 +186,6 @@ class pyOcr2:
             using a pdftoimages subprocess. The images generated
             (ppms) are temporarily stored in self.tmpdir
         """
-        print "pdfToImages"
         fnamebase = os.path.join(self.defaults['tmpdir'],self.inputFileName)
         try:
             subprocess.Popen([r"pdftoppm",\
@@ -212,7 +215,6 @@ class pyOcr2:
             image to the target format - which is the preferred
             input format of the ocr software
         """
-        print "convertToTargetFormat"
         options = {'optimize':1}
         iter = 0
         for img in self.rawImageHolder:
@@ -226,7 +228,6 @@ class pyOcr2:
             else:
                 try:
                     save_as = "%s.%s"%(img,self.defaults['ocrInputFormat'])
-                    print "save as is %s"%save_as
                     apply(im.save, (save_as,), options)
                 except Exception,e:
                     print e
@@ -240,7 +241,6 @@ class pyOcr2:
         """ Perform the ocr scan on each input image and concat
             the results of the scan to a single string
         """
-        print "doOcrScan"
         text = ""
         for img in self.readyImageHolder:
             try:
@@ -259,7 +259,6 @@ class pyOcr2:
         """ Depending on the chosen output format convert the 
             concatenated string to the appropriate format
         """
-        print "formatResults"
         re_page1 = re.compile(r'(?P<page1>.*)</body>.*',re.S)
         re_pagex = re.compile(r'.*<body>(?P<pagex>.*)</body>.*',re.S)
         re_pagen = re.compile(r'.*<body>(?P<pagen>.*)',re.S)
@@ -298,7 +297,6 @@ class pyOcr2:
     def writeToDisk(self):
         """ If output method is to write to file, open the file and write
             the text to it """
-        print "writeToDisk"
         try:
             open_write = open(self.outputFileAbspath,"w")
         except Exception,e:
@@ -311,6 +309,14 @@ class pyOcr2:
             return True
 
 if __name__ == "__main__":
+    
+    if len(sys.argv)!=4:
+        sys.stderr.write("   Usage: %s %s %s %s\n"%(sys.argv[0],\
+                        "<input file>","[output file]","[format]"))
+        sys.stderr.write("   Example: %s %s %s %s\n"%(sys.argv[0],\
+                        "/home/user/test.pdf","/home/user/result.html","''"))
+        sys.exit(1)
+    
     inputFile = sys.argv[1]
     outputFile = sys.argv[2]
     outputFileFormat = sys.argv[3]
@@ -322,7 +328,7 @@ if __name__ == "__main__":
     else: pass
 
     try:
-        a = pyOcr2(inputFile,outputFile,outputFileFormat)
+        a = pyocrhelper(inputFile,outputFile,outputFileFormat)
     except Exception,e:
         print e
     else:

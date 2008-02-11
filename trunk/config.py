@@ -37,7 +37,7 @@ class Start:
     def __init__(self,configfile='default'):
         if configfile == "default":
             #default_config = os.path.join(os.environ['HOME'],'.pyOcrHelper/pyOcrHelper.ini')
-            default_config = os.path.join(os.getcwd(),"pyOcrHelper.ini")
+            default_config = os.path.join(os.getcwd(),"pyocrhelper.ini")
             if os.path.isfile(default_config):
                 if not os.access(default_config,os.R_OK):
                     print "No permission to read %s"%default_config
