@@ -15,7 +15,7 @@ class pyocrhelper:
         self.defaults = self.getDefaultsFromConfig()
         self.clearTmp() # clear up the tmp directory before anything gets done
         self.pdfinfo = {} # will be filled if input is pdf
-        self.allowed_fmt = ['.html']
+        self.allowed_fmt = ['.html','.txt']
         self.inputFileAbspath = os.path.abspath(inputFile)
         self.inputFileName = os.path.basename(self.inputFileAbspath)
         self.inputFileFormat = self.getFileType()
@@ -23,6 +23,7 @@ class pyocrhelper:
             self.outputMethod = "return"
             self.outputFileAbspath = ""
             self.outputFileName = ""
+            
         else:
             self.outputMethod = "file"
             self.outputFileAbspath = os.path.abspath(outputFile)
@@ -275,6 +276,37 @@ class pyocrhelper:
                 self.rawText.append(text)
         sorted(self.rawText)
 
+    def html2txtwrapper(self,html):
+        """
+        Kind of overly aggressive function to convert html to text
+        Found on
+        """
+        p = re.compile('(<p.*?>)|(<tr.*?>)', re.I)
+        t = re.compile('<td.*?>', re.I)
+        comm = re.compile('<!--.*?-->', re.S)
+        dtd = re.compile('<!DOCTYPE.*?>',re.S)
+        tags = re.compile('<.*?>', re.M)
+
+        def html2txt(s, hint = 'entity', code = 'ISO-8859-1'):
+            """Convert the html to raw txt
+            - suppress all return
+            - <p>, <tr> to return
+            - <td> to tab
+            """
+            #s = s.replace('\n', '')
+            s = s.replace('OCR Output','')
+            s = p.sub('\n', s)
+            s = t.sub('\t', s)
+            s = dtd.sub('', s)
+            s = comm.sub('', s)
+            s = tags.sub('', s)
+            s = re.sub(' +', ' ', s)
+            # handling of entities
+            result = s
+            pass
+            return result
+        return html2txt(html)
+
     def formatResults(self):
         """ Depending on the chosen output format convert the 
             concatenated string to the appropriate format
@@ -285,7 +317,10 @@ class pyocrhelper:
         centre = ""
         if len(self.rawText) == 1:
             # check output format
-            return self.rawText[0]
+            if self.outputFileFormat == ".txt":
+                return self.html2txtwrapper(self.rawText[0])
+            else:
+                return self.rawText[0]
         elif len(self.rawText)==2:
             strip_page_1 = re.search(re_page1,self.rawText[0])
             if strip_page_1:
@@ -295,7 +330,11 @@ class pyocrhelper:
             if strip_page_2:
                 stripped_2 = strip_page_2.group('pagen')
             else: print "Failed to isolate page 2 structure"
-            return "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2)
+            if self.outputFileFormat == ".txt":
+                return self.html2txtwrapper(\
+                        "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2))
+            else:
+                return "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2)
         else:
             strip_page_1 = re.search(re_page1,self.rawText[0])
             if strip_page_1:
@@ -312,7 +351,11 @@ class pyocrhelper:
                     centre = \
                     "<!-- Page Break -->%s"%centre+strip_page_x.group('pagex')
                 else: print "Failed to isolate page x structure"
-            return "%s%s%s"%(stripped_1,centre,stripped_n)
+            if self.outputFileFormat == ".txt":
+                return self.html2txtwrapper(\
+                        "%s%s%s"%(stripped_1,centre,stripped_n))
+            else:
+                return "%s%s%s"%(stripped_1,centre,stripped_n)
 
     def writeToDisk(self):
         """ If output method is to write to file, open the file and write
