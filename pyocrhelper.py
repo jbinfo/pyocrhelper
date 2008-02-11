@@ -279,7 +279,7 @@ class pyocrhelper:
     def html2txtwrapper(self,html):
         """
         Kind of overly aggressive function to convert html to text
-        Found on
+        Found on http://snippets.dzone.com/tag/html2txt
         """
         p = re.compile('(<p.*?>)|(<tr.*?>)', re.I)
         t = re.compile('<td.*?>', re.I)
