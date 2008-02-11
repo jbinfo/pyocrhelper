@@ -3,3 +3,4 @@
   - added testSetup() frame for checking environment before starting
   - added README file with installation and usage instructions
   - added this CHANGES document
+  - added support for html2txt
