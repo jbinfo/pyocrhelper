@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys,os,re,time,subprocess,config,shutil
+import sys,os,re,time,subprocess,shutil
+# import config # not needed in v0.1
 from PIL import Image
 
 class pyocrhelper:
@@ -76,21 +77,40 @@ class pyocrhelper:
     def getDefaultsFromConfig(self):
         """ Read in the configuration from the config module and
             sort the values into a dictionary.
+
+            Note that reading in config from config.py is disabled
+            in v0.1 as it is really unnecessary for 4 vars. However,
+            leaving the code in is a good idea so we can scale up
+            if needed.
         """
-        try:
-            readConfig = config.Start()
-        except Exception,e:
-            print e # raise exception
         defaultsDict = {}
         defaultsDict['tmpdir'] = \
-                    readConfig.tmpdir
+                    "/tmp/pyocrhelper/"
         defaultsDict['outputFileFormat'] = \
-                    readConfig.outputFileFormat
+                    "html"
         defaultsDict['ocrInputFormat'] = \
-                    readConfig.ocrInputFormat
+                    "png"
         defaultsDict['ocrLocation'] = \
-                    readConfig.ocrLocation
+                    "/usr/bin/ocropus"
         return defaultsDict
+        #try:
+            #readConfig = config.Start()
+        #except Exception,e:
+        #    print e # raise exception
+        #defaultsDict = {}
+        #defaultsDict['tmpdir'] = \
+        #            "/tmp/pyocrhelper/"
+        #            #readConfig.tmpdir
+        #defaultsDict['outputFileFormat'] = \
+        #            "html"
+        #            #readConfig.outputFileFormat
+        #defaultsDict['ocrInputFormat'] = \
+        #            "png"
+        #            #readConfig.ocrInputFormat
+        #defaultsDict['ocrLocation'] = \
+        #            "/usr/bin/ocropus"
+        #            #readConfig.ocrLocation
+        #return defaultsDict
 
     def getOutputFormat(self,outputFileFormat):
         """ Determine the output format by looking at the
@@ -265,7 +285,7 @@ class pyocrhelper:
         centre = ""
         if len(self.rawText) == 1:
             # check output format
-            return raw
+            return self.rawText[0]
         elif len(self.rawText)==2:
             strip_page_1 = re.search(re_page1,self.rawText[0])
             if strip_page_1:
