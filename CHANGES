@@ -1,0 +1,5 @@
+2008-02-11, cfarrell:
+  - imported code from now extinct project py-ocr-helper
+  - added testSetup() frame for checking environment before starting
+  - added README file with installation and usage instructions
+  - added this CHANGES document
