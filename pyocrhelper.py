@@ -309,20 +309,35 @@ class pyocrhelper:
             return result
         return html2txt(html)
 
-    def formatResults(self):
-        """ Depending on the chosen output format convert the 
-            concatenated string to the appropriate format
+    def _getCoordinates(self,string):
+        """
+        Use a regular expression to extract the page coordinates
+        from a typical hOcr string
+        """
+        # split this into multiple lines
+        getdigits = re.compile(r'bbox\s+?(?P<pos1>\d{1,4})\s+?(?P<pos2>\d{1,4})\s+?(?P<pos3>\d{1,4})\s+?(?P<pos4>\d{1,4})',re.S)
+        a = re.search(getdigits,string)
+        if not a:
+            return None
+        else:
+            return (int(a.group('pos1')),int(a.group('pos2')),\
+                    int(a.group('pos3')),int(a.group('pos4')))
+
+    def _concat(self):
+        """
+        Refactor some code from formatResults which is needed
+        to concatenate multiple pages into one.
+        Returns one large html page
         """
         re_page1 = re.compile(r'(?P<page1>.*)</body>.*',re.S)
         re_pagex = re.compile(r'.*<body>(?P<pagex>.*)</body>.*',re.S)
         re_pagen = re.compile(r'.*<body>(?P<pagen>.*)',re.S)
         centre = ""
         if len(self.rawText) == 1:
-            # check output format
-            if self.outputFileFormat == ".txt":
-                return self.html2txtwrapper(self.rawText[0])
-            else:
-                return self.rawText[0]
+            pboundaries = self.pageAnalysis(self.rawText[0])
+            print pboundaries
+            exit()
+            return self.rawText[0]
         elif len(self.rawText)==2:
             strip_page_1 = re.search(re_page1,self.rawText[0])
             if strip_page_1:
@@ -332,11 +347,7 @@ class pyocrhelper:
             if strip_page_2:
                 stripped_2 = strip_page_2.group('pagen')
             else: print "Failed to isolate page 2 structure"
-            if self.outputFileFormat == ".txt":
-                return self.html2txtwrapper(\
-                        "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2))
-            else:
-                return "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2)
+            return "%s\n<!-- Page Break -->\n%s"%(stripped_1,stripped_2)
         else:
             strip_page_1 = re.search(re_page1,self.rawText[0])
             if strip_page_1:
@@ -353,11 +364,47 @@ class pyocrhelper:
                     centre = \
                     "<!-- Page Break -->%s"%centre+strip_page_x.group('pagex')
                 else: print "Failed to isolate page x structure"
-            if self.outputFileFormat == ".txt":
-                return self.html2txtwrapper(\
-                        "%s%s%s"%(stripped_1,centre,stripped_n))
-            else:
-                return "%s%s%s"%(stripped_1,centre,stripped_n)
+            return "%s%s%s"%(stripped_1,centre,stripped_n)
+
+
+    def pageAnalysis(self,page):
+        """
+            Get an impression of the page bounding
+            Tried doing this without lists but it wasn't pretty
+        """
+        from itertools import count, izip 
+        from operator import itemgetter
+        left_boundary = []
+        right_boundary = []
+        top_boundary = []
+        bottom_boundary = []
+        print page
+        for line in page.split('\n'):
+            coord_tup = self._getCoordinates(line)
+            if coord_tup:
+                left_boundary.append(int(coord_tup[0]))
+                right_boundary.append(int(coord_tup[2]))
+                top_boundary.append(int(coord_tup[1]))
+                bottom_boundary.append(int(coord_tup[3]))
+        print left_boundary
+        print right_boundary
+    
+        minindex, minvalue = min(enumerate(left_boundary), key=itemgetter(1))
+        print "Index and value of minimum of left_boundary is: %s %s"%(str(minindex),str(minvalue))
+        
+        exit()
+                
+
+
+    def formatResults(self):
+        """ Depending on the chosen output format convert the 
+            concatenated string to the appropriate format
+        """
+        text = self._concat()
+        if self.outputFileFormat == ".txt":
+            return self.html2txtwrapper(text)
+        else:
+            return text
 
     def writeToDisk(self):
         """ If output method is to write to file, open the file and write
