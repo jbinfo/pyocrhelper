@@ -1,3 +1,6 @@
+2008-02-12, cfarrell:
+  - changed default dpi of pdftoimages from 150 to 300
+
 2008-02-11, cfarrell:
   - imported code from now extinct project py-ocr-helper
   - added testSetup() frame for checking environment before starting

@@ -205,11 +205,13 @@ class pyocrhelper:
     def pdfToImages(self):
         """ If a pdf is recognised, convert the pages to images
             using a pdftoimages subprocess. The images generated
-            (ppms) are temporarily stored in self.tmpdir
+            (ppms) are temporarily stored in self.tmpdir. Note that
+            increasing dpi from pdftoppm's default 150 to ocropus's
+            preferred 300 yields noticeable quality improvements
         """
         fnamebase = os.path.join(self.defaults['tmpdir'],self.inputFileName)
         try:
-            subprocess.Popen([r"pdftoppm",\
+            subprocess.Popen([r"pdftoppm","-r","300",\
                             self.inputFileAbspath,fnamebase ],\
                             stdout=subprocess.PIPE,\
                             stderr=subprocess.PIPE).communicate()[0]
