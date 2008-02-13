@@ -12,7 +12,7 @@ When Ocropus analyses an image, it scans on a line per line basis. Thus, the htm
 
 From the above, the text {{{'I am a line of Ocropus content'}}} is exactly the text which was present in the image - i.e. what the reader will eventually read.
 
-From looking at the <span> tag, it is possible to see that Ocropus usefully output some positional information for us. This positional information does not seem to be used in the html markup (Ocropus could possibly use css formatting which might make use of the bbox but I'm not sure about this). As far as I can tell, using the above example:
+From looking at the <span> tag, it is possible to see that Ocropus usefully outputs some positional information for us. This positional information does not seem to be used in the html markup (Ocropus could possibly use css formatting which might make use of the bbox but I'm not sure about this). As far as I can tell, using the above example:
 
   * 237 is the leftmost x coordinate
   * 371 is the topmost y coordinate
