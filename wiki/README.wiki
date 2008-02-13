@@ -35,7 +35,7 @@ http://software.opensuse.org/search?q=pyocrhelper
 
 *USEFUL HINTS ON OBTAINING AND INSTALLING OCROPUS*
 ----
-Ocropus is available directly from the ocropus google code project at http://code.google.com/p/ocropus - if you want to configure and build it yourself, that is. A much better and easier solution is to use the [http://build.opensuse.org]openSUSE build service. Ocropus and tesseract are both packaged there for openSUSE and for some other distributions as well. Here are the download links:
+Ocropus is available directly from the ocropus google code project at http://code.google.com/p/ocropus - if you want to configure and build it yourself, that is. A much better and easier solution is to use the [http://build.opensuse.org openSUSE build service]. Ocropus and tesseract are both packaged there for openSUSE and for some other distributions as well. Here are the download links:
 
 Ocropus: http://software.opensuse.org/search?baseproject=ALL&p=1&q=ocropus
 Tesseract: http://software.opensuse.org/search?baseproject=ALL&p=1&q=tesseract
