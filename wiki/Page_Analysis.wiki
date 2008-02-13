@@ -1,5 +1,5 @@
 #labels Phase-Design
-=This page describes how pyocrhelper analyses html page layout output by ocropus.=
+*This page describes how pyocrhelper analyses html page layout output by ocropus.*
 ----
 
 *What does a line of content from Ocropus look like?*
@@ -8,4 +8,28 @@ When Ocropus analyses an image, it scans on a line per line basis. Thus, the htm
 
 {{{
    <span class='ocr_line' title='bbox 237 371 2058 412'>I am a line of Ocropus content</span>
+}}}
+
+From the above, the text {{{'I am a line of Ocropus content'}}} is exactly the text which was present in the image - i.e. what the reader will eventually read.
+
+From looking at the <span> tag, it is possible to see that Ocropus usefully output some positional information for us. This positional information does not seem to be used in the html markup (Ocropus could possibly use css formatting which might make use of the bbox but I'm not sure about this). As far as I can tell, using the above example:
+
+  * 237 is the leftmost x coordinate
+  * 371 is the topmost y coordinate
+  * 2058 is the rightmost x coordinate
+  * 412 is the bottommost y coordinate
+
+
+*Analysing the layout of a typical Ocropus html page*
+
+----
+
+If we split the html string output from pyocrhelper (or Ocropus for that matter) into lines, we can examine each line individually and feed the data into an array/list (which we can later analyse more completely). Thus:
+
+{{{
+content_line_match = re.compile(r'<span.*</span>',re.S)
+ocr_lines = ocropus_output.split('\n')
+for line in ocr_lines:
+    if re.match(content_line_match,line):
+        print line
 }}}
