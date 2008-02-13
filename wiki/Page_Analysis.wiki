@@ -53,12 +53,18 @@ If we split the html string output from pyocrhelper (or Ocropus for that matter)
 hold_left_col = []
 content_line_match = re.compile(r'<span.*</span>',re.S)
 ocr_lines = ocropus_output.split('\n')
+bottom_y = 0 # contains value of bottommost y coord of previous line
 for line in ocr_lines:
     if re.match(content_line_match,line):
         coordinates = self._getCoordinates(line)
         hold_left_col.append(coordinates[0]) # append leftmost x coord
-
+        if bottom_y < coord_tup[1]:
+            if bottom_y != 0: gap.append(coordinates[1]-bottom_y)
+        bottom_y = coord_tup[3]
 print hold_left_col
+print
+print gap
+
 [796, 93, 203, 1811, 478, 476, 478, 478, 477, 477, 477, 477, 
 477, 476, 476, 475, 516, 514, 513, 513, 514, 513, 513, 473, 
 475, 475, 474, 476, 472, 474, 474, 475, 474, 474, 474, 472, 
@@ -68,6 +74,19 @@ print hold_left_col
 1502, 1502, 1499, 1501, 1501, 1534, 1500, 1501, 1501, 1501, 
 1500, 1500, 1523]
 
+[195, 18, 19, 19, 19, 17, 67, 19, 19, 19, 19, 18, 60, 19, 19,
+20, 19, 19, 20, 60, 19, 19, 59, 19, 26, 19, 18, 18, 18, 19, 
+18, 18, 18, 18, 19, 59, 19, 202, 19, 19, 19, 19, 18, 18, 18,
+18, 18, 19, 18, 19, 19, 18, 23, 18, 19, 18, 18, 19, 18, 59,
+18, 60, 19, 17, 18, 18, 18, 60, 18, 19, 18, 19, 25, 18, 68]
+
 }}}
 
 For the document above (a two column page of text), Ocropus recognised two 'main' column left boundaries - if we cancel out the 'noise', these are roughly the x coordinates ~477 and ~1470.
+Likewise, if we look at the gaps between the lines, we see that that the gaps frequency falls into two major groups:
+  # roughly 18
+  # roughly 60
+There are, however, some much larger gaps also evident. If we could analyse the frequency properly, we would therefore break down the 'standard' gap into the following:
+  # ~18 must be a standard line break
+  # ~60 must be a standard paragraph break
+If we choose *not* to ignore the 'extreme' gaps we could also factor them into a group of their own. Depending on the quality of layout analysis required, this might or might not be useful.
