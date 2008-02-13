@@ -399,7 +399,7 @@ class pyocrhelper:
                 top_boundary.append(int(coord_tup[1]))
                 bottom_boundary.append(int(coord_tup[3]))
                 if bottom_y < coord_tup[1]:
-                    print "%d,%d"%(bottom_y,coord_tup[1])
+                    #print "%d,%d"%(bottom_y,coord_tup[1])
                     if bottom_y != 0: gap.append(coord_tup[1]-bottom_y)
                 bottom_y = coord_tup[3]
     
@@ -442,6 +442,24 @@ class pyocrhelper:
             open_write.write(self.formattedText)
             open_write.close
             return True
+
+class analyse:
+    """ Code to perform actual page/line analysis refactored here """
+    def __init__(self):
+        pass
+
+    def _analysePage(self):
+        pass
+
+    def _analyseLine(self):
+        pass
+
+    def _analyseSpectrum(self):
+        pass
+
+class output:
+    """ Code to perform output formatting refactored here """
+    pass
 
 if __name__ == "__main__":
     
