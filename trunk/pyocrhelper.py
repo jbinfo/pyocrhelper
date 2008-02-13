@@ -378,7 +378,19 @@ class pyocrhelper:
         right_boundary = []
         top_boundary = []
         bottom_boundary = []
-        print page
+        gap = []
+        bottom_y = 0 # y position of bottommost coordinate on line
+        """
+        239,371
+        +--------------------------------------------+
+        | this is a line of text in ocropus          |
+        +--------------------------------------------+ 2048,412
+        |------------- this is the gap (425-412)-----|
+        239,425
+        +--------------------------------------------+
+        | this is another line of text in ocropus    |
+        +--------------------------------------------+ 2048,466
+        """
         for line in page.split('\n'):
             coord_tup = self._getCoordinates(line)
             if coord_tup:
@@ -386,12 +398,23 @@ class pyocrhelper:
                 right_boundary.append(int(coord_tup[2]))
                 top_boundary.append(int(coord_tup[1]))
                 bottom_boundary.append(int(coord_tup[3]))
-        print left_boundary
-        print right_boundary
+                if bottom_y < coord_tup[1]:
+                    print "%d,%d"%(bottom_y,coord_tup[1])
+                    if bottom_y != 0: gap.append(coord_tup[1]-bottom_y)
+                bottom_y = coord_tup[3]
     
-        minindex, minvalue = min(enumerate(left_boundary), key=itemgetter(1))
-        print "Index and value of minimum of left_boundary is: %s %s"%(str(minindex),str(minvalue))
-        
+        minlindex, minlvalue = min(enumerate(left_boundary), key=itemgetter(1))
+        maxlindex, maxlvalue = max(enumerate(left_boundary), key=itemgetter(1))
+        minrindex, maxrvalue = min(enumerate(right_boundary), key=itemgetter(1))
+        maxrindex, maxrvalue = max(enumerate(right_boundary), key=itemgetter(1))
+        mintindex, mintvalue = min(enumerate(top_boundary), key=itemgetter(1))
+        maxtindex, maxtvalue = max(enumerate(top_boundary), key=itemgetter(1))
+        minbindex, minbvalue = min(enumerate(bottom_boundary), key=itemgetter(1))
+        maxbindex, maxbvalue = max(enumerate(bottom_boundary), key=itemgetter(1))
+        print "Index and value of minimum of left_boundary is: %s %s"%(str(minlindex),str(minlvalue))
+        print "Index and value of maximum of left_boundary is: %s %s"%(str(maxlindex),str(maxlvalue))
+        print "The following is the list of gaps determined"
+        print gap
         exit()
                 
 
