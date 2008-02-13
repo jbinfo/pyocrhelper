@@ -2,6 +2,9 @@
 *pyocrhelper v0.1*
 ----
 
+
+
+
 *ABOUT*
 ----
 Ocropus is a high quality OCR software which accepts images files as input and
@@ -26,6 +29,7 @@ http://code.google.com/p/pyocrhelper/downloads/list
 There may also be an rpm available at:
 https://build.opensuse.org/project/show?project=home:babelworx
 http://software.opensuse.org/search?q=pyocrhelper
+
 
 
 
