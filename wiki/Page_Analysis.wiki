@@ -31,12 +31,28 @@ From looking at the <span> tag, it is possible to see that Ocropus usefully outp
 
 ----
 
-If we split the html string output from pyocrhelper (or Ocropus for that matter) into lines, we can examine each line individually and feed the data into an array/list (which we can later analyse more completely). Thus:
+If we split the html string output from pyocrhelper (or Ocropus for that matter) into lines, we can examine each line individually and feed the data into an array/list (which we can later analyse more completely). Thus (from pyocrhelper.py):
 
 {{{
+    def _getCoordinates(self,string):
+        """
+        Use a regular expression to extract the page coordinates
+        from a typical hOcr string
+        """
+        # split this into multiple lines
+        getdigits = re.compile(r'bbox\s+?(?P<pos1>\d{1,4})\s+?\
+                    (?P<pos2>\d{1,4})\s+?(?P<pos3>\d{1,4})\s+?\
+                    (?P<pos4>\d{1,4})',re.S)
+        a = re.search(getdigits,string)
+        if not a:
+            return None
+        else:
+            return (int(a.group('pos1')),int(a.group('pos2')),\
+                    int(a.group('pos3')),int(a.group('pos4')))
+
 content_line_match = re.compile(r'<span.*</span>',re.S)
 ocr_lines = ocropus_output.split('\n')
 for line in ocr_lines:
     if re.match(content_line_match,line):
-        print line
+        coordinates = self._getCoordinates(line)
 }}}
