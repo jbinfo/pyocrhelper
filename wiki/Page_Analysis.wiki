@@ -19,6 +19,13 @@ From looking at the <span> tag, it is possible to see that Ocropus usefully outp
   * 2058 is the rightmost x coordinate
   * 412 is the bottommost y coordinate
 
+{{{
+237,371
+       +--------------------------------+
+       | I am a line of Ocropus content |
+       +--------------------------------+ 2058,412
+}}}
+
 
 *Analysing the layout of a typical Ocropus html page*
 
