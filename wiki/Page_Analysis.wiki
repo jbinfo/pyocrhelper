@@ -50,9 +50,24 @@ If we split the html string output from pyocrhelper (or Ocropus for that matter)
             return (int(a.group('pos1')),int(a.group('pos2')),\
                     int(a.group('pos3')),int(a.group('pos4')))
 
+hold_left_col = []
 content_line_match = re.compile(r'<span.*</span>',re.S)
 ocr_lines = ocropus_output.split('\n')
 for line in ocr_lines:
     if re.match(content_line_match,line):
         coordinates = self._getCoordinates(line)
+        hold_left_col.append(coordinates[0]) # append leftmost x coord
+
+print hold_left_col
+[796, 93, 203, 1811, 478, 476, 478, 478, 477, 477, 477, 477, 
+477, 476, 476, 475, 516, 514, 513, 513, 514, 513, 513, 473, 
+475, 475, 474, 476, 472, 474, 474, 475, 474, 474, 474, 472, 
+471, 473, 473, 474, 473, 181, 1469, 1468, 1466, 1468, 1468, 
+1467, 1468, 1465, 1467, 1467, 1467, 1465, 1466, 1466, 1467, 
+1467, 1467, 1467, 1466, 1466, 1466, 1466, 1532, 1502, 1534, 
+1502, 1502, 1499, 1501, 1501, 1534, 1500, 1501, 1501, 1501, 
+1500, 1500, 1523]
+
 }}}
+
+For the document above (a two column page of text), Ocropus recognised two 'main' column left boundaries - if we cancel out the 'noise', these are roughly the x coordinates ~477 and ~1470.
