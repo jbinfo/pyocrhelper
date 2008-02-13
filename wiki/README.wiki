@@ -1,0 +1,28 @@
+#labels Phase-Deploy
+*pyocrhelper v0.1*
+----
+
+*ABOUT*
+
+Ocropus is a high quality OCR software which accepts images files as input and
+outputs html text files. Ocropus is quite good at what it does. pyOcrHelper is
+a python class which makes interacting with Ocropus easier for an end user or
+a developer by taking care of all the steps which have to be taken before
+Ocropus can be used:
+
+   # determine filetype of input file
+   # if (etc) pdf, convert pdf to images
+   # convert input image(s) to Ocropus input image
+   # run Ocropus on the input image(s)
+   # format the Ocropus output (concatenating files if necessary)
+
+You can checkout the pyocrhelper source from Google SVN with the following 
+command:
+svn checkout http://pyocrhelper.googlecode.com/svn/trunk/ pyocrhelper-read-only
+
+There may also be releases available at:
+http://code.google.com/p/pyocrhelper/downloads/list
+
+There may also be an rpm available at:
+https://build.opensuse.org/project/show?project=home:babelworx
+http://software.opensuse.org/search?q=pyocrhelper
