@@ -1,0 +1,31 @@
+-------------------------------------------------------------------
+Wed Feb 13 15:21:59 CET 2008 - cfarrell@suse.de
+
+- Added bootstrap classes for analysis and output 
+
+-------------------------------------------------------------------
+Wed Feb 13 13:34:28 CET 2008 - cfarrell@suse.de
+
+- Positional information now output to a list and min and max 
+  calculated (izip and operator required)
+- Evaluating jw's spectrum analyser (perl) to calculate distribution
+  of list values 
+
+-------------------------------------------------------------------
+Tue Feb 12 17:54:09 CET 2008 - cfarrell@suse.de
+
+- Starting to parse the positional information output by ocropus
+  which isn't going to be easy - some statistical analysis is needed
+- See th
+
+2008-02-12, cfarrell:
+
+- changed default dpi of pdftoimages from 150 to 300
+
+2008-02-11, cfarrell:
+
+- imported code from now extinct project py-ocr-helper
+- added testSetup() frame for checking environment before starting
+- added README file with installation and usage instructions
+- added this CHANGES document
+- added support for html2txt
