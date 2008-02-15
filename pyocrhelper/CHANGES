@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb 15 17:19:44 CET 2008 - cfarrell@suse.de
+
+- Fixed bugs in analyse module. It is now compatible with ocrocol.pl
+- Fixed code to determine where paragraphs and line breaks occur
+- This check-in should actually be quite usable. See test.py
+
+-------------------------------------------------------------------
 Fri Feb 15 10:28:19 CET 2008 - cfarrell@suse.de
 
 - Refactored code out to responsible modules
