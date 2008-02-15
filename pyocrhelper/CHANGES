@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb 15 10:28:19 CET 2008 - cfarrell@suse.de
+
+- Refactored code out to responsible modules
+- Added strip() code to output.py to add <br/> to the end of 
+  content lines (will probably have to look at css later) 
+
+-------------------------------------------------------------------
 Wed Feb 13 15:21:59 CET 2008 - cfarrell@suse.de
 
 - Added bootstrap classes for analysis and output 
