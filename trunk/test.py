@@ -53,7 +53,7 @@ for page in raw:
     pageLayout = {}
     pageinfo = doctor.analysePage(page)
     pageLayout =    {
-                    #'gaps_analysis':doctor.analyse_gaps,
+                    'gaps_analysis':doctor.analyse_gaps,
                     'max_l':doctor.max_l,
                     'max_t':doctor.max_t,
                     'max_r':doctor.max_r,
@@ -64,10 +64,7 @@ for page in raw:
                     'by_analysis':doctor.analyse_by,
                     'page_text':page
                     }
-    print pageLayout
-    exit()
     pageHolder.append(pageLayout)
-
 outputter = output(pageHolder)
 outputter.stripFirst()
 outputter.stripLast()

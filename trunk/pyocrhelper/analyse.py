@@ -1,3 +1,7 @@
+import re
+from itertools import count,izip
+from operator import itemgetter
+
 class analyse:
 
     def __init__(self):
@@ -35,6 +39,7 @@ class analyse:
 
     def group(self,ma,arr):
         m = {}
+        list = []
         for a in arr:
             best = -1
             dist = 0xfffffff
@@ -117,8 +122,8 @@ class analyse:
                 self.by.append(coord[3])
                 hanging = int(coord[3])
 
-    def doAnalysis(list):
-        blist = blur(newlist)
+    def doAnalysis(self,list):
+        blist = self.blur(list)
         maxima = []
         m = (0,0)
         rising = 1
@@ -130,7 +135,7 @@ class analyse:
                     maxima.append(m)
                     rising = 0
             m = blist[i]
-        return self.group(maxima,newlist)
+        return self.group(maxima,list)
 
     def analysePage(self,page):
         self.page = page
