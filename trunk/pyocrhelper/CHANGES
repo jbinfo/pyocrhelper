@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 15 22:14:11 CET 2008 - cfarrell@suse.de
+
+- Fixed bugs in output.py which constantly set last_y to 0 even
+  if a suitable coordinate was found
+
+-------------------------------------------------------------------
 Fri Feb 15 17:19:44 CET 2008 - cfarrell@suse.de
 
 - Fixed bugs in analyse module. It is now compatible with ocrocol.pl

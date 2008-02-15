@@ -65,9 +65,6 @@ for page in raw:
                     'page_text':page
                     }
     pageHolder.append(pageLayout)
-outputter = output(pageHolder)
-outputter.stripFirst()
-outputter.stripLast()
-outputter.stripCentre()
-for i in pageHolder:
+outputter = output().output(pageHolder)
+for i in outputter:
     print i['page_text']
