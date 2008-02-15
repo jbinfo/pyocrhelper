@@ -4,13 +4,35 @@ import re,sys
 
 class output:
 
-    def __init__(self,pagelist):
+    def __init__(self):
         self.defaults = config().defaults
+        self.pages = []
+    
+    def output(self,pagelist):
         self.pages = pagelist
+        if len(self.pages)==1:
+            self.stripFirst(1)
+        else:
+            self.stripFirst()
+            if len(self.pages) == 2:
+                self.stripLast()
+            else:
+                self.stripCentre()
+                self.stripLast()
+        return self.pages
 
-    def stripFirst(self):
+
+    def stripFirst(self,none_following=0):
+        """
+        If none_following is set to 1 by the calling script, then
+        this method does not attempt to strip the closing body and
+        html tags. Otherwise it does
+        """
         re_first = re.compile(r'(?P<page1>.*)</body>.*',re.S)
-        search = re.search(re_first,self.pages[0]['page_text'])
+        if none_following == 0:
+            search = re.search(re_first,self.pages[0]['page_text'])
+        else:
+            search = True
         gaps = self.pages[0]['gaps_analysis']
         #gaps is a list of dicts
         smallest_av = (0,99999)
@@ -20,7 +42,10 @@ class output:
         avg_lower_range = gaps[smallest_av[0]]['min']
         avg_upper_range = gaps[smallest_av[0]]['max']
         if search:
-            content = search.group('page1')
+            if none_following == 0:
+                content = search.group('page1')
+            else:
+                content = self.pages[0]
             last_y = 0
             lines_with_br = ""
             for line in content.split('\n'):
@@ -41,28 +66,45 @@ class output:
 
     def stripLast(self):
         re_last = re.compile(r'.*<body>(?P<pagen>.*)',re.S)
+        fifi = self.pages[len(self.pages)-1]['page_text']
         search = re.search(re_last,\
                 self.pages[len(self.pages)-1]['page_text'])
+        gaps = self.pages[0]['gaps_analysis']
+        smallest_av = (0,99999)
+        last_y = 0
+        for x in gaps:
+            if x['avg'] < smallest_av[1]:
+                smallest_av = (gaps.index(x),x['avg'])
+        avg_lower_range = gaps[smallest_av[0]]['min']
+        avg_upper_range = gaps[smallest_av[0]]['max']
         if search:
             content = search.group('pagen')
-            last_y = 0
             lines_with_br = ""
             for line in content.split('\n'):
                 coords = analyse().getCoordinates(line)
                 if coords:
                     if last_y != 0:
-                        whitespace_above = int(coords[2])-last_y
-                        last_y = int(coords[3])
-                    lines_with_br = lines_with_br+"%s<br/>"%line
+                        whitespace_above = int(coords[1])-last_y
+                        if whitespace_above <= avg_upper_range and whitespace_above >= avg_lower_range:
+                            lines_with_br = lines_with_br+"<br/>%s"%line
+                        else:
+                            lines_with_br = lines_with_br+"<br/><br/>%s"%line
+                    last_y = int(coords[1])
                 else:
                     lines_with_br = lines_with_br+line
-            self.pages[len(self.pages)-1]['page_text']\
-                 = lines_with_br
+            self.pages[len(self.pages)-1]['page_text'] = lines_with_br
 
     def stripCentre(self):
         re_centre = \
                 re.compile(r'.*<body>(?P<pagex>.*)</body>.*',re.S)
         for centrepages in self.pages[1:len(self.pages)-2]:
+            gaps = centrepages['gaps_analysis']
+            smallest_av = (0,99999)
+            for x in gaps:
+                if x['avg'] < smallest_av[1]:
+                    smallest_av = (gaps.index(x),x['avg'])
+            avg_lower_range = gaps[smallest_av[0]]['min']
+            avg_upper_range = gaps[smallest_av[0]]['max']
             search = re.search(re_centre,centrepages['page_text'])
             if search:
                 content = search.group('pagex')
@@ -73,13 +115,16 @@ class output:
                     coords = analyse().getCoordinates(line)
                     if coords:
                         if last_y != 0:
-                            whitespace_above = int(coords[2])-last_y
-                            last_y = int(coords[3])
-                        lines_with_br = lines_with_br+"%s<br/>"%line
+                            whitespace_above = int(coords[1])-last_y
+                            if whitespace_above <= avg_upper_range and whitespace_above >= avg_lower_range:
+                                lines_with_br = lines_with_br+"<br/>%s"%line
+                            else:
+                                lines_with_br = lines_with_br+"<br/><br/>%s"%line
+                        last_y = int(coords[1])
                     else:
                         lines_with_br = lines_with_br+line
-                self.pages[indexof]['page_text']\
-                     = lines_with_br
+                lines_with_br = lines_with_br+"<!-- PAGE BREAK -->"
+                self.pages[indexof]['page_text'] = lines_with_br
 
 	    
     def html2txtwrapper(self,html):
