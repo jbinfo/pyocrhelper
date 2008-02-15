@@ -1,20 +1,77 @@
-import re
-from itertools import count,izip
-from operator import itemgetter
 class analyse:
-    """ Code to perform actual page/line analysis refactored here """
 
     def __init__(self):
-        """
-        Analyses a page output by ocropus
-        """
-        self.page = "" 
+        self.page = ""
         self.gaps = []
         self.lx,self.ty,self.rx,self.by = [],[],[],[] # lists for coord type
         self.max_l = 0 # leftmost x coordinate (on page)
         self.max_t = 0 # topmost y coordinate (on page)
         self.max_r = 0 # rightmost x coordinate (on page)
         self.max_b = 0 # bottommost y coordinate (on page)
+
+    def weight(self,a,b,max):
+        d = 0.0
+        if max <= 0:
+            if a == b: return 1
+            else: return 0
+
+        if a > b: d = a-b
+        else: d = b-a
+
+        if d >= max: return 0
+        else:
+            return float(1.0-(float(d)/float(max)))
+
+    def blur(self,arr,factor=0.1):
+        lbound,hbound = min(arr),max(arr)
+        spread = int(0.5 * factor * (hbound-lbound))
+        slist = []
+        for x in range((lbound-spread),(hbound+spread)):
+            s = 0
+            for i in arr:
+                s += self.weight(x,i,spread)
+            slist.append((x,s))
+        return slist
+
+    def group(self,ma,arr):
+        m = {}
+        for a in arr:
+            best = -1
+            dist = 0xfffffff
+            for mt in ma:
+                d = mt[0]-a
+                if d < 0: d = -d
+                if d < dist:
+                    dist = d
+                    best = mt[0]
+            if not m.has_key(best):
+                m[best] = {'n':0,'x':0,'sum':0,'sumsq':0}
+            m[best]['n'] = m[best]['n'] + 1
+            m[best]['x'] = best
+            m[best]['sum'] = m[best]['sum'] + a
+            m[best]['sumsq'] = m[best]['sumsq'] **2
+            if not m[best].has_key('min'):
+                m[best]['min'] = a
+            else:
+                if a < m[best]['min']: m[best]['min'] = a
+            if not m[best].has_key('max'):
+                m[best]['max'] = a
+            else:
+                if a > m[best]['max']: m[best]['max'] = a
+
+        for x in m.keys():
+            avg = m[x]['sum']/m[x]['n']
+            avgsq = m[x]['sumsq']/m[x]['n']
+            m[x]['avg'] = int(avg)
+            m[x]['var'] = avgsq-(m[x]['avg']**2)
+            del(m[x]['x'])
+            del(m[x]['sumsq'])
+            del(m[x]['sum']) 
+        # return a list to stay as compatible as possible with ocrocol.py
+        for x in m.keys():
+            list.append(m[x])
+        return list
+    
 
     def getCoordinates(self,line):
         """
@@ -60,79 +117,20 @@ class analyse:
                 self.by.append(coord[3])
                 hanging = int(coord[3])
 
-
-    def weight(self,a, b, int_max):
-        if int_max <=0:
-            if a==b: return 1
-            else: return 0
-        if a > b : d = a - b
-        else: d = b -a
-        if d > int_max : return 0
-        return 1-(d/int_max)
-
-    def blur(self,list,factor=0.1):
-        lbound,hbound = int(min(list)),int(max(list))
-        spread = int(factor * (hbound-lbound))
-        s = []
-        for x in range((lbound-spread),(hbound+spread)):
-            sum = 0
-            for i in list:
-                sum += self.weight(x,i,spread)
-            s.append((x,sum))
-        return s
-
-    def group(self,maxima,list):
-        """
-        Group the weighed clusters by cluster and include
-        data on cluster average and cluster variance
-        Accepts 2 lists whereby maxima is a list of dicts
-        Returns dictionary
-        """
-        mdict = {}
-        for a in list:
-            best = -1
-            dist = 0xfffffff
-            for m in maxima:
-                d = (m[0]-a)
-                if d < 0 : d = -d
-                if d < dist:
-                    dist = d
-                    best = m[0]
-            if not mdict.has_key(best):
-                mdict[best] = {"n":0,"sum":0,"sumsq":0}
-            mdict[best]["n"] += 1
-            mdict[best]["x"] = best
-            mdict[best]["sum"] += a
-            mdict[best]["sumsq"] += a**2
-            if not mdict[best].has_key("min") : mdict[best]["min"] = a
-            if a < mdict[best]["min"] : mdict[best]["min"] = a
-            if not mdict[best].has_key("max") : mdict[best]["max"] = a
-            if a > mdict[best]["max"] : mdict[best]["max"] = a
-
-        for y in [v for k,v in enumerate(mdict)]: # list of dicts
-            avg = mdict[y]["sum"]/mdict[y]["n"]
-            avgsq = mdict[y]["sumsq"]/mdict[y]["n"]
-            mdict[y]["avg"] = int(avg)
-            mdict[y]["var"] = avgsq - (mdict[y]["avg"]*mdict[y]["avg"])
-            del(mdict[y]["x"])
-            del(mdict[y]["sumsq"])
-            del(mdict[y]["sum"])
-
-        return mdict
-
-    def doAnalysis(self,list):
-        blurred = self.blur(list)
+    def doAnalysis(list):
+        blist = blur(newlist)
         maxima = []
-        m = (0,0) #???
+        m = (0,0)
         rising = 1
-        for i in range(0,len(blurred)-1):
-            if blurred[i][1] > m[1]:
+        for i in range(0,len(blist)):
+            if blist[i][1] > m[1]:
                 rising = 1
-            if blurred[i][1] < m[1]:
-                if rising != 0: maxima.append(m)
-            rising = 0
-            m = blurred[i]
-        return self.group(maxima,list)
+            if blist[i][1] < m[1]:
+                if rising:
+                    maxima.append(m)
+                    rising = 0
+            m = blist[i]
+        return self.group(maxima,newlist)
 
     def analysePage(self,page):
         self.page = page
@@ -142,3 +140,4 @@ class analyse:
         self.analyse_ty = self.doAnalysis(self.ty)
         self.analyse_by = self.doAnalysis(self.by)
         self.analyse_gaps = self.doAnalysis(self.gaps)
+        return True
