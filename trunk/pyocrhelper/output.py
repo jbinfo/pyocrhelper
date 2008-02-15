@@ -20,8 +20,11 @@ class output:
                 if coords:
                     if last_y != 0:
                         whitespace_above = int(coords[2])-last_y
+                        last_y = int(coords[3])
                         # this is where the decision <br> or <p> is made
                     lines_with_br = lines_with_br+"%s<br/>"%line
+                else:
+                    lines_with_br = lines_with_br+line
             self.pages[0]['page_text'] = lines_with_br
 
     def stripLast(self):
@@ -29,8 +32,20 @@ class output:
         search = re.search(re_last,\
                 self.pages[len(self.pages)-1]['page_text'])
         if search:
+            content = search.group('pagen')
+            last_y = 0
+            lines_with_br = ""
+            for line in content.split('\n'):
+                coords = analyse().getCoordinates(line)
+                if coords:
+                    if last_y != 0:
+                        whitespace_above = int(coords[2])-last_y
+                        last_y = int(coords[3])
+                    lines_with_br = lines_with_br+"%s<br/>"%line
+                else:
+                    lines_with_br = lines_with_br+line
             self.pages[len(self.pages)-1]['page_text']\
-                 = search.group('pagen')
+                 = lines_with_br
 
     def stripCentre(self):
         re_centre = \
@@ -38,9 +53,21 @@ class output:
         for centrepages in self.pages[1:len(self.pages)-2]:
             search = re.search(re_centre,centrepages['page_text'])
             if search:
+                content = search.group('pagex')
                 indexof = self.pages.index(centrepages)
+                last_y = 0
+                lines_with_br = ""
+                for line in content.split('\n'):
+                    coords = analyse().getCoordinates(line)
+                    if coords:
+                        if last_y != 0:
+                            whitespace_above = int(coords[2])-last_y
+                            last_y = int(coords[3])
+                        lines_with_br = lines_with_br+"%s<br/>"%line
+                    else:
+                        lines_with_br = lines_with_br+line
                 self.pages[indexof]['page_text']\
-                     = search.group('pagex')
+                     = lines_with_br
 
 	    
     def html2txtwrapper(self,html):
