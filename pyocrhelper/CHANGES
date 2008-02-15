@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb 15 23:04:34 CET 2008 - cfarrell@suse.de
+
+- Added method formatLineBreaks() to output.py in order to
+  refactor all code dealing with appending breaks to lins to
+  a single method. It works for single pages but doesn't append
+  line breaks for multiple pages
+
+-------------------------------------------------------------------
 Fri Feb 15 22:14:11 CET 2008 - cfarrell@suse.de
 
 - Fixed bugs in output.py which constantly set last_y to 0 even
