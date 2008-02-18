@@ -90,3 +90,34 @@ There are, however, some much larger gaps also evident. If we could analyse the 
   # ~18 must be a standard line break
   # ~60 must be a standard paragraph break
 If we choose *not* to ignore the 'extreme' gaps we could also factor them into a group of their own. Depending on the quality of layout analysis required, this might or might not be useful.
+
+*Using a blur algorithm to do cluster analysis on the coordinate list*
+----
+Although for a human it may be quite clear from a list such as the list described above, that there really are only two predominant 'gaps' (at roughly 18 and roughly 60), for the python interpreter, this is not at all clear, so we somehow have to make it clear. The algorithm uses is a 'blur' algorithm which 'heaps' the clusters of coordinates into individual heaps or piles. It should then be possible to analyse the individual heaps to identify the main 'heaps' and their minimum, maximum and standard deviance. Consider the following code:
+
+{{{
+
+def weight(self,a,b,max):
+    d = 0.0
+    if max <= 0:
+        if a == b: return 1
+        else: return 0
+    if a > b: d = a-b
+    else: d = b-a
+
+    if d >= max: return 0
+    else:
+        return float(1.0-(float(d)/float(max)))
+
+def blur(self,arr,factor=0.1):
+    lbound,hbound = min(arr),max(arr)
+    spread = int(0.5 * factor * (hbound-lbound))
+    slist = []
+    for x in range((lbound-spread),(hbound+spread)):
+        s = 0
+        for i in arr:
+            s += self.weight(x,i,spread)
+        slist.append((x,s))
+    return slist
+
+}}}
